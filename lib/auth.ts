@@ -3,15 +3,15 @@ import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import { MongoClient } from "mongodb";
 
-const client = new MongoClient(process.env.MONGODB_URI);
+const client = new MongoClient(process.env.MONGODB_URI!);
 const clientPromise = client.connect();
 
-export const authOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+export const authOptions: NextAuthOptions = {
+  adapter: MongoDBAdapter(clientPromise) as any,
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
           scope: "openid email profile https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.readonly",
@@ -33,9 +33,9 @@ export const authOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        session.accessToken = token.accessToken;
-        session.refreshToken = token.refreshToken;
-        session.userId = token.userId;
+        session.accessToken = token.accessToken as string;
+        session.refreshToken = token.refreshToken as string;
+        session.userId = token.userId as string;
       }
       return session;
     },
@@ -44,6 +44,6 @@ export const authOptions = {
     signIn: "/auth/signin",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
 };

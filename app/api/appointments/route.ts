@@ -1,9 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { connectToDatabase, Appointment } from "@/lib/database";
+import { connectToDatabase } from "@/lib/database";
 import { GoogleCalendarService } from "@/lib/google-calendar";
 import { ObjectId } from "mongodb";
+
+interface Appointment {
+  sellerId: string;
+  buyerId: string;
+  title: string;
+  description?: string;
+  startTime: Date;
+  endTime: Date;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  googleEventId?: string;
+  meetLink?: string;
+}
+
+interface User {
+  email: string;
+  accessToken?: string;
+  refreshToken?: string;
+}
 
 export async function GET() {
   try {
@@ -116,13 +136,13 @@ export async function POST(request: NextRequest) {
 
     // Get seller's access token (optional for Google Calendar integration)
     console.log("Looking for seller user with email:", seller.userId);
-    const sellerUser = await db.collection("users").findOne({ email: seller.userId });
+    const sellerUser = await db.collection("users").findOne({ email: seller.userId }) as User | null;
     console.log("Seller user found:", sellerUser ? "Yes" : "No");
     console.log("Seller has access token:", sellerUser?.accessToken ? "Yes" : "No");
 
     // Get buyer's access token (optional for Google Calendar integration)
     console.log("Looking for buyer user with email:", session.user.email);
-    const buyerUser = await db.collection("users").findOne({ email: session.user.email });
+    const buyerUser = await db.collection("users").findOne({ email: session.user.email }) as User | null;
     console.log("Buyer user found:", buyerUser ? "Yes" : "No");
     console.log("Buyer has access token:", buyerUser?.accessToken ? "Yes" : "No");
 
@@ -147,7 +167,7 @@ export async function POST(request: NextRequest) {
 
     // Create Google Calendar events for both seller and buyer (if tokens are available)
     try {
-      if (sellerUser.accessToken && buyerUser.accessToken) {
+      if (sellerUser?.accessToken && buyerUser?.accessToken) {
         console.log("Creating Google Calendar events...");
         
         // Create event for seller
@@ -177,7 +197,7 @@ export async function POST(request: NextRequest) {
 
         // Create event for buyer
         const buyerCalendarService = new GoogleCalendarService(buyerUser.accessToken, buyerUser.refreshToken);
-        const buyerEvent = await buyerCalendarService.createEvent({
+        await buyerCalendarService.createEvent({
           summary: title || `Appointment with ${seller.businessName || seller.userId}`,
           description: description || `Appointment with ${seller.businessName || seller.userId}`,
           start: {
