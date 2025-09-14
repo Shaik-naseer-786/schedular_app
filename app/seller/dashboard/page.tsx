@@ -14,11 +14,22 @@ interface Seller {
   timezone: string;
 }
 
+interface Appointment {
+  _id: string;
+  sellerId: string;
+  buyerId: string;
+  title: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  // Add other appointment properties as needed
+}
+
 export default function SellerDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [seller, setSeller] = useState<Seller | null>(null);
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,7 +51,7 @@ export default function SellerDashboard() {
       ]);
 
       if (profileResponse.ok) {
-        const data = await profileResponse.json();
+        const data: Seller = await profileResponse.json();
         setSeller(data);
       } else if (profileResponse.status === 404) {
         // Seller profile doesn't exist, redirect to setup
@@ -48,7 +59,7 @@ export default function SellerDashboard() {
       }
 
       if (appointmentsResponse.ok) {
-        const appointmentsData = await appointmentsResponse.json();
+        const appointmentsData: Appointment[] = await appointmentsResponse.json();
         setAppointments(appointmentsData);
       }
     } catch (error) {
@@ -57,6 +68,8 @@ export default function SellerDashboard() {
       setLoading(false);
     }
   };
+
+  
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/" });

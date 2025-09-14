@@ -1,6 +1,25 @@
 import { google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 
+interface CalendarEvent {
+  summary: string;
+  description?: string;
+  start: { dateTime: string; timeZone: string };
+  end: { dateTime: string; timeZone: string };
+  attendees: { email: string }[];
+  conferenceData?: {
+    createRequest: {
+      requestId: string;
+      conferenceSolutionKey: { type: string };
+    };
+  };
+}
+
+interface BusyTime {
+  start: string;
+  end: string;
+}
+
 export class GoogleCalendarService {
   private oauth2Client: OAuth2Client;
 
@@ -55,19 +74,7 @@ export class GoogleCalendarService {
     }
   }
 
-  async createEvent(eventDetails: {
-    summary: string;
-    description?: string;
-    start: { dateTime: string; timeZone: string };
-    end: { dateTime: string; timeZone: string };
-    attendees: { email: string }[];
-    conferenceData?: {
-      createRequest: {
-        requestId: string;
-        conferenceSolutionKey: { type: string };
-      };
-    };
-  }) {
+  async createEvent(eventDetails: CalendarEvent) {
     const calendar = google.calendar({ version: "v3", auth: this.oauth2Client });
     
     try {
@@ -84,7 +91,7 @@ export class GoogleCalendarService {
     }
   }
 
-  async updateEvent(eventId: string, eventDetails: any) {
+  async updateEvent(eventId: string, eventDetails: Partial<CalendarEvent>) {
     const calendar = google.calendar({ version: "v3", auth: this.oauth2Client });
     
     try {
@@ -121,7 +128,7 @@ export class GoogleCalendarService {
 export function generateTimeSlots(
   startDate: Date,
   endDate: Date,
-  busyTimes: any[],
+  busyTimes: BusyTime[],
   durationMinutes: number = 30
 ): { start: Date; end: Date; available: boolean }[] {
   const slots: { start: Date; end: Date; available: boolean }[] = [];

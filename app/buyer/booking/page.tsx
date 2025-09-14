@@ -20,6 +20,12 @@ interface TimeSlot {
   available: boolean;
 }
 
+interface ApiTimeSlot {
+  start: string;
+  end: string;
+  available: boolean;
+}
+
 export default function BuyerBooking() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -79,10 +85,10 @@ export default function BuyerBooking() {
       console.log("Response status:", response.status);
       
       if (response.ok) {
-        const data = await response.json();
+        const data: ApiTimeSlot[] = await response.json();
         console.log("Time slots data:", data);
         // Convert string dates back to Date objects
-        const timeSlotsWithDates = data.map((slot: any) => ({
+        const timeSlotsWithDates = data.map((slot: ApiTimeSlot) => ({
           ...slot,
           start: new Date(slot.start),
           end: new Date(slot.end),

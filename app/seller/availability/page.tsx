@@ -12,6 +12,12 @@ interface TimeSlot {
   available: boolean;
 }
 
+interface ApiTimeSlot {
+  start: string;
+  end: string;
+  available: boolean;
+}
+
 export default function SellerAvailability() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -35,9 +41,9 @@ export default function SellerAvailability() {
     try {
       const response = await fetch(`/api/seller/availability?date=${selectedDate}`);
       if (response.ok) {
-        const data = await response.json();
+        const data: ApiTimeSlot[] = await response.json();
         // Convert string dates back to Date objects
-        const timeSlotsWithDates = data.map((slot: any) => ({
+        const timeSlotsWithDates = data.map((slot: ApiTimeSlot) => ({
           ...slot,
           start: new Date(slot.start),
           end: new Date(slot.end),
@@ -56,6 +62,8 @@ export default function SellerAvailability() {
       setLoading(false);
     }
   };
+
+  
 
   const generateDefaultSlots = () => {
     const startTime = new Date(selectedDate + "T09:00:00");
