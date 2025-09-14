@@ -29,12 +29,17 @@ interface Seller {
   timezone: string;
 }
 
+interface User {
+  email: string;
+  name?: string;
+}
+
 export default function AppointmentsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [sellers, setSellers] = useState<Seller[]>([]);
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -110,10 +115,6 @@ export default function AppointmentsPage() {
       default:
         return "bg-gray-100 text-gray-800";
     }
-  };
-
-  const isAppointmentExpired = (endTime: string) => {
-    return new Date(endTime) <= new Date();
   };
 
   const isAppointmentExpiringSoon = (endTime: string) => {

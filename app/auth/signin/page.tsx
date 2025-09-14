@@ -71,7 +71,7 @@ export default function SignInPage() {
         
         <div className="space-y-4">
           <div className="bg-white p-6 rounded-lg shadow-md border">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">I'm a Seller</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">I&rsquo;m a Seller</h3>
             <p className="text-sm text-gray-600 mb-4">
               Connect your Google Calendar to manage your availability and accept appointments.
             </p>
@@ -107,7 +107,7 @@ export default function SignInPage() {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md border">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">I'm a Buyer</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">I&rsquo;m a Buyer</h3>
             <p className="text-sm text-gray-600 mb-4">
               Sign in to book appointments with sellers and manage your schedule.
             </p>
