@@ -18,14 +18,21 @@ export async function GET(
     const { db } = await connectToDatabase();
     const { id } = await params;
     
-    // Handle both string and ObjectId formats
     let seller;
-    try {
-      // Try as ObjectId first
-      seller = await db.collection("sellers").findOne({ _id: new ObjectId(id) });
-    } catch (error) {
-      // If ObjectId fails, try as string
-      seller = await db.collection("sellers").findOne({ _id: id });
+    
+    // Check if id is a valid ObjectId first
+    if (ObjectId.isValid(id)) {
+      seller = await db.collection("sellers").findOne({ 
+        _id: new ObjectId(id) 
+      });
+    }
+    
+    // If not found with ObjectId or id is not a valid ObjectId, try as string
+    // Use type assertion to handle the string case
+    if (!seller) {
+      seller = await db.collection("sellers").findOne({ 
+        _id: id as any  // Type assertion to fix the TypeScript error
+      });
     }
     
     if (!seller) {
